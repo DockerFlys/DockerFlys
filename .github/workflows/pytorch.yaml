@@ -6,7 +6,7 @@ on:
   #   - cron: '1 1 * * 0'
 
 env:
-  BUILD_BERSION: "2.2.2-cuda12.1-cudnn8-devel"
+  BUILD_BERSION: "2.2.2-cuda12.1-cudnn8-runtime"
 
 jobs:
   push_to_registries:
