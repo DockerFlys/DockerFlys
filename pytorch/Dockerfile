@@ -10,7 +10,7 @@ RUN apt-get update -y && \
     rm -rf /var/lib/apt/lists/* && \
     sed -i -e 's/archive.ubuntu.com/mirrors.tencent.com/g' /etc/apt/sources.list  && \
     sed -i -e 's/security.ubuntu.com/mirrors.tencent.com/g' /etc/apt/sources.list  && \
-    sed -i -e 's/https:\/\/developer.download.nvidia.com\/compute\/cuda\/repos/http:\/\/mirrors.tencent.com\/nvidia-cuda/g' /etc/apt/sources.list.d/cuda* && \
+    sed -i -e 's/https:\/\/developer.download.nvidia.com\/compute\/cuda\/repos/http:\/\/mirrors.tencent.com\/nvidia-cuda/g' /etc/apt/sources.list.d/cuda-ubuntu2204-x86_64.list && \
     mkdir -p /workspace && \
     adduser --disabled-password --gecos '' user && \
     chown -R user:user /workspace
