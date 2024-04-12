@@ -56,7 +56,7 @@ jobs:
             dockerflays/pytorch
             ghcr.io/dockerflays/pytorch
           tags: |
-            ${BUILD_BERSION}
+            ${{ env.BUILD_BERSION }}
             type=sha,enable=true,priority=100,prefix=sha-,suffix=,format=short
             type=raw,value=action-{{branch}}-{{date 'YYYYMMDD-HHmmss' tz='Asia/Shanghai'}}
           labels: |
@@ -64,8 +64,8 @@ jobs:
             org.opencontainers.image.title=pytorch
             org.opencontainers.image.description=pytorch images update default mirrors
             org.opencontainers.image.vendor=DockerFlys
-            org.opencontainers.image.version=${BUILD_BERSION}
-            
+            org.opencontainers.image.version=${{ env.BUILD_BERSION }}
+
 
       - name: Build and push Docker images
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
