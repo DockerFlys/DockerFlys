@@ -53,7 +53,7 @@ jobs:
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
           images: |
-            dockerflays/pytorch
+            # dockerflays/pytorch
             ccr.ccs.tencentyun.com/dockerflays/pytorch
           tags: |
             ${{ env.BUILD_BERSION }}
