@@ -1,0 +1,28 @@
+name: Clean up Jobs
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "50 23 * * *"
+
+jobs:
+  CleanUp:
+    name: Clean Up
+    runs-on: us
+    steps:
+      - name: Clean Up
+        run: |
+            docker system prune -af 
+        shell: bash
+      - name: Dayly Artifact Cleanup
+        uses: jimschubert/delete-artifacts-action@v1
+        with:
+          log_level: 'error'
+          min_bytes: '0'
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          retain_days: 0
+          keep_minimum_runs: 6
+      - name: Clean Up
+        uses: AutoModality/action-clean@v1
