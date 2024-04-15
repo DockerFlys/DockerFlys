@@ -25,19 +25,19 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Log in to GitHub registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      
-      # - name: Log in to Tencent registry GZ
+      # - name: Log in to GitHub registry
       #   uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
       #   with:
-      #     registry: ccr.ccs.tencentyun.com
-      #     username: ${{ secrets.DOCKER_USERNAME_TENCENT }}
-      #     password: ${{ secrets.DOCKER_PASSWORD_TENCENT }}
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Log in to Tencent registry GZ
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ccr.ccs.tencentyun.com
+          username: ${{ secrets.DOCKER_USERNAME_TENCENT }}
+          password: ${{ secrets.DOCKER_PASSWORD_TENCENT }}
 
       # - name: Log in to Tencent registry USW
       #   uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
@@ -54,7 +54,7 @@ jobs:
         with:
           images: |
             dockerflays/pytorch
-            ghcr.io/dockerflays/pytorch
+            ccr.ccs.tencentyun.com/dockerflays/pytorch
           tags: |
             ${{ env.BUILD_BERSION }}
             type=sha,enable=true,priority=100,prefix=sha-,suffix=,format=short
