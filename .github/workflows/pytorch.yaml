@@ -62,7 +62,7 @@ jobs:
           labels: |
             maintainer=DockerFlys
             org.opencontainers.image.title=pytorch
-            org.opencontainers.image.description=pytorch images update default mirrors
+            org.opencontainers.image.description="pytorch images update default mirrors"
             org.opencontainers.image.vendor=DockerFlys
             org.opencontainers.image.version=${{ env.BUILD_BERSION }}
 
