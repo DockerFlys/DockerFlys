@@ -93,7 +93,7 @@ jobs:
                     done
                 fi
                 
-            done < "${GITHUB_WORKSPACE}/registry.txt"
+            done < "${GITHUB_WORKSPACE}/registrys.txt"
         shell: bash
       - name: Dayly Artifact Cleanup
         uses: jimschubert/delete-artifacts-action@v1
