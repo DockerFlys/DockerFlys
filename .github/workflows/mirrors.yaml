@@ -70,12 +70,12 @@ jobs:
       - name: Mirror Docker images
         if: ( !cancelled() )
         run: |
-            for registry in uswccr.ccs.tencentyun.com ccr.ccs.tencentyun.com; do
-                docker login -u ${{ secrets.DOCKER_USERNAME_TENCENT }} -p ${{ secrets.DOCKER_PASSWORD_TENCENT }} ${registry}
-            done
-            for registry in registry.us-west-1.aliyuncs.com registry.cn-hangzhou.aliyuncs.com; do
-                docker login -u ${{ secrets.DOCKER_USERNAME_ALIYUN }} -p ${{ secrets.DOCKER_PASSWORD_ALIYUN }} ${registry}
-            done
+            # for registry in uswccr.ccs.tencentyun.com ccr.ccs.tencentyun.com; do
+            #     docker login -u ${{ secrets.DOCKER_USERNAME_TENCENT }} -p ${{ secrets.DOCKER_PASSWORD_TENCENT }} ${registry}
+            # done
+            # for registry in registry.us-west-1.aliyuncs.com registry.cn-hangzhou.aliyuncs.com; do
+            #     docker login -u ${{ secrets.DOCKER_USERNAME_ALIYUN }} -p ${{ secrets.DOCKER_PASSWORD_ALIYUN }} ${registry}
+            # done
             while IFS= read -r line; do
                 name=$(echo "$line" | awk -F'/' '{print $NF}' | sed 's/\[.*//')
                 source=$(echo "$line" | awk '{print $1}' | sed 's/\[.*//') 
