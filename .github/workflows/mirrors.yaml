@@ -87,8 +87,8 @@ jobs:
                         echo "${source}:${version}"
                         docker pull ${source}:${version}
                         for registry in uswccr.ccs.tencentyun.com ccr.ccs.tencentyun.com registry.us-west-1.aliyuncs.com registry.cn-hangzhou.aliyuncs.com;do
-                          docker tag ${source}:${version} ${registry}/dockerflays/${name}:${version}
-                          docker push ${registry}/dockerflays/${name}:${version} ||true
+                          docker tag ${source}:${version} ${registry}/${{ secrets.DOCKER_USERNAME }}/${name}:${version}
+                          docker push ${registry}/${{ secrets.DOCKER_USERNAME }}/${name}:${version} ||true
                         done
                     done
                 fi
