@@ -1,0 +1,109 @@
+name: Mirror Docker Image
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '5 5 * * 0'
+  push:
+    branches: [ "main" ]
+
+env:
+  PROJECT_NAME_REPO: "${GITHUB_REPOSITORY##*/}"
+  DOCKER_IMAGES_FROM: "ollama/ollama:latest"
+  DOCKER_IMAGES_TAG: "latest"
+
+jobs:
+  push_to_registries:
+    name: Push Docker image to multiple registries
+    runs-on: self-hosted
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        if: ( !cancelled() )
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # - name: Log in to GitHub registry
+      #   uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+      #   if: ( !cancelled() )
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Log in to Tencent registry GZ
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        if: ( !cancelled() )
+        with:
+          registry: ccr.ccs.tencentyun.com
+          username: ${{ secrets.DOCKER_USERNAME_TENCENT }}
+          password: ${{ secrets.DOCKER_PASSWORD_TENCENT }}
+
+      - name: Log in to Tencent registry USW
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: uswccr.ccs.tencentyun.com
+          username: ${{ secrets.DOCKER_USERNAME_TENCENT }}
+          password: ${{ secrets.DOCKER_PASSWORD_TENCENT }}
+
+      - name: Log in to Aliyun registry HZ
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        if: ( !cancelled() )
+        with:
+          registry: registry.cn-hangzhou.aliyuncs.com
+          username: ${{ secrets.DOCKER_USERNAME_ALIYUN }}
+          password: ${{ secrets.DOCKER_PASSWORD_ALIYUN }}
+
+      - name: Log in to Aliyun registry USW
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: registry.us-west-1.aliyuncs.com
+          username: ${{ secrets.DOCKER_USERNAME_ALIYUN }}
+          password: ${{ secrets.DOCKER_PASSWORD_ALIYUN }}
+
+      - name: Mirror Docker images
+        if: ( !cancelled() )
+        run: |
+            for registry in uswccr.ccs.tencentyun.com ccr.ccs.tencentyun.com; do
+                docker login -u ${{ secrets.DOCKER_USERNAME_TENCENT }} -p ${{ secrets.DOCKER_PASSWORD_TENCENT }} ${registry}
+            done
+            for registry in registry.us-west-1.aliyuncs.com registry.cn-hangzhou.aliyuncs.com; do
+                docker login -u ${{ secrets.DOCKER_USERNAME_ALIYUN }} -p ${{ secrets.DOCKER_PASSWORD_ALIYUN }} ${registry}
+            done
+            while IFS= read -r line; do
+                name=$(echo "$line" | awk -F'/' '{print $NF}' | sed 's/\[.*//')
+                source=$(echo "$line" | awk '{print $1}' | sed 's/\[.*//') 
+                echo "${name}::"
+                if [[ $line =~ \[([^]]+)\] ]]; then
+                    inside_bracket="${BASH_REMATCH[1]}"
+                    IFS=';' read -ra bracket_parts <<< "$inside_bracket"
+                    for version in "${bracket_parts[@]}"; do
+                        echo "${source}:${version}"
+                        docker pull ${source}:${version}
+                        for registry in uswccr.ccs.tencentyun.com ccr.ccs.tencentyun.com registry.us-west-1.aliyuncs.com registry.cn-hangzhou.aliyuncs.com;do
+                          docker tag ${source}:${version} ${registry}/dockerflays/${name}:${version}
+                          docker push ${registry}/dockerflays/${name}:${version}
+                        done
+                    done
+                fi
+                
+            done < "registry.txt"
+        shell: bash
+      - name: Dayly Artifact Cleanup
+        uses: jimschubert/delete-artifacts-action@v1
+        with:
+          log_level: 'error'
+          min_bytes: '0'
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          retain_days: 0
+          keep_minimum_runs: 6
+      - name: Clean Up
+        uses: AutoModality/action-clean@v1
