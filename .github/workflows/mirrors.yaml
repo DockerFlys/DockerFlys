@@ -95,14 +95,14 @@ jobs:
             done < "${GITHUB_WORKSPACE}/registrys.txt"
             wait
             p=1
-            while ${p}
+            while [ $p -ne 0 ]
             do
                 screen -wipe &> /dev/null
                 p=$(screen -ls|grep push | wc -l|awk '{print int($0)}')
                 echo "推送中，waitting..."
                 sleep 30
             done
-            echo 推送完毕
+            echo "推送完毕"
             exit 0
         shell: bash
       - name: Dayly Artifact Cleanup
@@ -110,10 +110,5 @@ jobs:
         with:
           log_level: 'error'
           min_bytes: '0'
-      - name: Delete workflow runs
-        uses: Mattraks/delete-workflow-runs@v2
-        with:
-          retain_days: 0
-          keep_minimum_runs: 6
       - name: Clean Up
         uses: AutoModality/action-clean@v1
