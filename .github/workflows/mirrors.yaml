@@ -93,15 +93,13 @@ jobs:
                     done
                 fi
             done < "${GITHUB_WORKSPACE}/registrys.txt"
-            set -x
-            p=1
-            while [ $p -ne 0 ]
-            do
+            set -x            
+            do {
                 echo "推送中，waitting..."
                 sleep 30
-                screen -wipe &> /dev/null
+                screen -wipe ||true &> /dev/null
                 p=$(screen -ls|grep push | wc -l|awk '{print int($0)}')
-            done
+            } while [ $p -ne 0 ]
             echo "推送完毕"
             exit 0
         shell: bash
