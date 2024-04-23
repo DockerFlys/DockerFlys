@@ -88,12 +88,23 @@ jobs:
                         docker pull ${source}:${version}
                         for registry in uswccr.ccs.tencentyun.com ccr.ccs.tencentyun.com registry.us-west-1.aliyuncs.com registry.cn-hangzhou.aliyuncs.com;do
                           docker tag ${source}:${version} ${registry}/${{ secrets.DOCKER_USERNAME }}/${name}:${version}
-                          docker push ${registry}/${{ secrets.DOCKER_USERNAME }}/${name}:${version} ||true
+                          screen -dmS push-${registry}-${name} docker push ${registry}/${{ secrets.DOCKER_USERNAME }}/${name}:${version}
                         done
                     done
                 fi
-                
             done < "${GITHUB_WORKSPACE}/registrys.txt"
+            wait
+            while true
+            do
+                p=$(ps | grep -v "push" | wc -l|awk '{print int($0)}')
+                if [ $p -ne 0 ]; then
+                    echo "等待推送完成，waitting..."
+                    sleep 5
+                else
+                    echo 推送完毕
+                    break
+                fi
+            done
         shell: bash
       - name: Dayly Artifact Cleanup
         uses: jimschubert/delete-artifacts-action@v1
