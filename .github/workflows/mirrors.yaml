@@ -85,15 +85,15 @@ jobs:
                     IFS=';' read -ra bracket_parts <<< "$inside_bracket"
                     for version in "${bracket_parts[@]}"; do
                         echo "${source}:${version}"
-                        docker pull ${source}:${version}
+                        docker pull ${source}:${version} &> /dev/null
                         for registry in uswccr.ccs.tencentyun.com ccr.ccs.tencentyun.com registry.us-west-1.aliyuncs.com registry.cn-hangzhou.aliyuncs.com;do
-                          docker tag ${source}:${version} ${registry}/${{ secrets.DOCKER_USERNAME }}/${name}:${version}
+                          docker tag ${source}:${version} ${registry}/${{ secrets.DOCKER_USERNAME }}/${name}:${version} &> /dev/null
                           screen -dmS push-${registry}-${name} docker push ${registry}/${{ secrets.DOCKER_USERNAME }}/${name}:${version}
                         done
                     done
                 fi
             done < "${GITHUB_WORKSPACE}/registrys.txt"
-            wait
+            set -x
             p=1
             while [ $p -ne 0 ]
             do
