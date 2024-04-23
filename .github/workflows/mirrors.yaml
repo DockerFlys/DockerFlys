@@ -97,10 +97,10 @@ jobs:
             p=1
             while [ $p -ne 0 ]
             do
-                screen -wipe &> /dev/null
-                p=$(screen -ls|grep push | wc -l|awk '{print int($0)}')
                 echo "推送中，waitting..."
                 sleep 30
+                screen -wipe &> /dev/null
+                p=$(screen -ls|grep push | wc -l|awk '{print int($0)}')
             done
             echo "推送完毕"
             exit 0
