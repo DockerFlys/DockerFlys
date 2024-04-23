@@ -103,7 +103,7 @@ jobs:
                     screen -wipe &> /dev/null
                 else
                     echo 推送完毕
-                    break
+                    exit 0
                 fi
             done
         shell: bash
