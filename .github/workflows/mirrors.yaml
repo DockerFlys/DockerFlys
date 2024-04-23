@@ -92,7 +92,7 @@ jobs:
                     done
                 fi
             done < "${GITHUB_WORKSPACE}/registrys.txt"
-            set -x            
+            # set -x            
             while [ $(screen -ls|grep push | wc -l|awk '{print int($0)}') -ne 0 ] 
             do
                 echo "推送中，waitting..."
