@@ -14,7 +14,7 @@ env:
 
 jobs:
   push_to_registries:
-    name: Push Docker image to multiple registries
+    name: sync Image to Registrys
     runs-on: self-hosted
     permissions:
       packages: write
@@ -92,12 +92,14 @@ jobs:
                     done
                 fi
             done < "${GITHUB_WORKSPACE}/registrys.txt"
-            # set -x            
-            while [ $(screen -ls|grep push | wc -l|awk '{print int($0)}') -ne 0 ] 
+            # set -x
+            sp=1
+            while [ ${sp} -ne 0 ] 
             do
                 echo "推送中，waitting..."
                 sleep 30
                 screen -wipe ||true &> /dev/null
+                sp=$(screen -ls|grep push | wc -l|awk '{print int($0)}')
             done
             echo "推送完毕"
             exit 0
