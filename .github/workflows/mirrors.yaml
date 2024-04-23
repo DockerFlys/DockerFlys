@@ -99,8 +99,8 @@ jobs:
                 p=$(screen -ls|grep push | wc -l|awk '{print int($0)}')
                 if [ $p -ne 0 ]; then
                     echo "等待推送完成，waitting..."
-                    sleep 5
-                    screen -wipe
+                    sleep 30
+                    screen -wipe &> /dev/null
                 else
                     echo 推送完毕
                     break
