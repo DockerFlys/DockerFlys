@@ -96,10 +96,11 @@ jobs:
             wait
             while true
             do
-                p=$(ps | grep -v "push" | wc -l|awk '{print int($0)}')
+                p=$(screen -ls|grep push | wc -l|awk '{print int($0)}')
                 if [ $p -ne 0 ]; then
                     echo "等待推送完成，waitting..."
                     sleep 5
+                    screen -wipe
                 else
                     echo 推送完毕
                     break
