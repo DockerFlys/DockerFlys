@@ -94,18 +94,16 @@ jobs:
                 fi
             done < "${GITHUB_WORKSPACE}/registrys.txt"
             wait
-            while true
+            p=1
+            while ${p}
             do
+                screen -wipe &> /dev/null
                 p=$(screen -ls|grep push | wc -l|awk '{print int($0)}')
-                if [ $p -ne 0 ]; then
-                    echo "等待推送完成，waitting..."
-                    sleep 30
-                    screen -wipe &> /dev/null
-                else
-                    echo 推送完毕
-                    exit 0
-                fi
+                echo "推送中，waitting..."
+                sleep 30
             done
+            echo 推送完毕
+            exit 0
         shell: bash
       - name: Dayly Artifact Cleanup
         uses: jimschubert/delete-artifacts-action@v1
