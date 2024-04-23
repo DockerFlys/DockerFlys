@@ -79,7 +79,6 @@ jobs:
             while IFS= read -r line; do
                 name=$(echo "$line" | awk -F'/' '{print $NF}' | sed 's/\[.*//')
                 source=$(echo "$line" | awk '{print $1}' | sed 's/\[.*//') 
-                echo "${name}::"
                 if [[ $line =~ \[([^]]+)\] ]]; then
                     inside_bracket="${BASH_REMATCH[1]}"
                     IFS=';' read -ra bracket_parts <<< "$inside_bracket"
@@ -94,12 +93,12 @@ jobs:
                 fi
             done < "${GITHUB_WORKSPACE}/registrys.txt"
             set -x            
-            do {
+            while [ $(screen -ls|grep push | wc -l|awk '{print int($0)}') -ne 0 ] 
+            do
                 echo "推送中，waitting..."
                 sleep 30
                 screen -wipe ||true &> /dev/null
-                p=$(screen -ls|grep push | wc -l|awk '{print int($0)}')
-            } while [ $p -ne 0 ]
+            done
             echo "推送完毕"
             exit 0
         shell: bash
