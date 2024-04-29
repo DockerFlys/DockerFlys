@@ -3,7 +3,8 @@ name: Mirror Docker Image
 on:
   workflow_dispatch:
   push:
-    branches: [ "main" ]
+    paths:
+      - 'registrys.txt'
 
 jobs:
   push_to_registries:
