@@ -74,13 +74,12 @@ jobs:
                     inside_bracket="${BASH_REMATCH[1]}"
                     IFS=';' read -ra bracket_parts <<< "$inside_bracket"
                     for version in "${bracket_parts[@]}"; do
-                        echo "${source}:${version}"
-                        docker pull ${source}:${version} &> /dev/null
                         needpull=false
                         for registry in uswccr.ccs.tencentyun.com ccr.ccs.tencentyun.com registry.us-west-1.aliyuncs.com registry.cn-hangzhou.aliyuncs.com;do
                           # 逐个检查目标是否存在
                           if [ $(docker manifest inspect -v  ${registry}/${{ secrets.DOCKER_USERNAME }}/${name}:${version}|jq ".Descriptor.size") == '' ] ; then
                               needpull=true
+                              echo "${source}:${version}"
                               break
                           fi
                         done
