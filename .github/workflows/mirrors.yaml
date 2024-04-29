@@ -8,7 +8,7 @@ on:
 
 jobs:
   push_to_registries:
-    name: sync Image to Registrys
+    name: Mirror Image to Registrys
     runs-on: self-hosted
     permissions:
       packages: write

@@ -1,4 +1,4 @@
-name: Mirror Docker Image
+name: Rsync Latest Image
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
  
 jobs:
   push_to_registries:
-    name: sync Image to Registrys
+    name: sync Latest Image to Registrys
     runs-on: self-hosted
     permissions:
       packages: write
