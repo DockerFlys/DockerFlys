@@ -2,9 +2,9 @@ name: Mirror Docker Image
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ "main" ]
-
+  schedule:
+    - cron: '5 5 * * *' 
+ 
 jobs:
   push_to_registries:
     name: sync Image to Registrys
@@ -60,50 +60,35 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME_ALIYUN }}
           password: ${{ secrets.DOCKER_PASSWORD_ALIYUN }}
 
-      - name: Mirror Docker images
+      - name: Mirror Latest images
         if: ( !cancelled() )
         run: |
-            # 1 根据配置文件生成需要拉取的所有镜像列表和需要推送的目标镜像列表
-            # 2 逐一检查，确认所有目标镜像是否存在
-            # 3 拉取不存在的目标镜像的源，并向目标镜像仓库推送
-
+            # 只针对 要求 latest 版本的镜像
+            cat ${GITHUB_WORKSPACE}/registrys.txt|grep latest &> /tmp/registrys.txt
             while IFS= read -r line; do
                 name=$(echo "$line" | awk -F'/' '{print $NF}' | sed 's/\[.*//')
                 source=$(echo "$line" | awk '{print $1}' | sed 's/\[.*//') 
-                if [[ $line =~ \[([^]]+)\] ]]; then
-                    inside_bracket="${BASH_REMATCH[1]}"
-                    IFS=';' read -ra bracket_parts <<< "$inside_bracket"
-                    for version in "${bracket_parts[@]}"; do
-                        echo "${source}:${version}"
-                        docker pull ${source}:${version} &> /dev/null
-                        needpull=false
+                if [[ $line =~ \[([^]]+)\] ]]; then 
+                    echo "${source}:latest"
+                    # 只要一个目标镜像不存在，拉下来以后都推送一轮 
+                    docker pull ${source}:latest || true
+                    if [ $? -eq 0 ]; then
                         for registry in uswccr.ccs.tencentyun.com ccr.ccs.tencentyun.com registry.us-west-1.aliyuncs.com registry.cn-hangzhou.aliyuncs.com;do
-                          # 逐个检查目标是否存在
-                          if [ $(docker manifest inspect -v  ${registry}/${{ secrets.DOCKER_USERNAME }}/${name}:${version}|jq ".Descriptor.size") == '' ] ; then
-                              needpull=true
-                              break
-                          fi
+                            docker tag ${source}:latest ${registry}/${{ secrets.DOCKER_USERNAME }}/${name}:latest&> /dev/null
+                            screen -dmS push-${registry}-${name} docker push ${registry}/${{ secrets.DOCKER_USERNAME }}/${name}:latest
                         done
-                        if [ ${needpull} ]; then
-                            # 只要一个目标镜像不存在，拉下来以后都推送一轮 
-                            docker pull ${source}:${version} &> /dev/null
-                            for registry in uswccr.ccs.tencentyun.com ccr.ccs.tencentyun.com registry.us-west-1.aliyuncs.com registry.cn-hangzhou.aliyuncs.com;do
-                              docker tag ${source}:${version} ${registry}/${{ secrets.DOCKER_USERNAME }}/${name}:${version} &> /dev/null
-                              screen -dmS push-${registry}-${name} docker push ${registry}/${{ secrets.DOCKER_USERNAME }}/${name}:${version}
-                            done
-                        fi
-                    done
+                    fi
                 fi
-            done < "${GITHUB_WORKSPACE}/registrys.txt"
+            done < "/tmp/registrys.txt"
             echo "当前推送任务："
             while [ $(screen -ls|grep push | wc -l|awk '{print int($0)}') -ne 0 ] 
             do
                 echo "推送中，waitting..."
-                sleep 30
+                sleep 60
                 screen -wipe ||true &> /dev/null
             done
             echo "推送完毕"
-            docker system prune -af
+            # docker system prune -af
             exit 0
         shell: bash
       - name: Dayly Artifact Cleanup
