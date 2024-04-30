@@ -12,6 +12,7 @@ jobs:
     runs-on: self-hosted
     permissions:
       packages: write
+      actions: write
       contents: read
     steps:
       - name: Check out the repo

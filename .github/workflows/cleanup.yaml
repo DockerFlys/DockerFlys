@@ -5,10 +5,17 @@ on:
   schedule:
     - cron: "50 23 * * *"
 
+permissions:
+  actions: write
+
 jobs:
   CleanUp:
     name: Clean Up
     runs-on: self-hosted
+    permissions:
+      packages: write
+      actions: write
+      contents: read
     steps:
       - name: Clean Up
         run: |
