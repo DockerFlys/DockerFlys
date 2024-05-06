@@ -17,6 +17,9 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          
       - name: Log in to Docker Hub
         uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
         if: ( !cancelled() )
@@ -107,10 +110,10 @@ jobs:
             docker system prune -af
             exit 0
         shell: bash
-      - name: Dayly Artifact Cleanup
-        uses: jimschubert/delete-artifacts-action@v1
-        with:
-          log_level: 'error'
-          min_bytes: '0'
-      - name: Clean Up
-        uses: AutoModality/action-clean@v1
+      # - name: Dayly Artifact Cleanup
+      #   uses: jimschubert/delete-artifacts-action@v1
+      #   with:
+      #     log_level: 'error'
+      #     min_bytes: '0'
+      # - name: Clean Up
+      #   uses: AutoModality/action-clean@v1

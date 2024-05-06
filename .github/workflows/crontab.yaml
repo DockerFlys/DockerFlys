@@ -12,10 +12,13 @@ jobs:
     permissions:
       packages: write
       actions: write
-      contents: read
+      contents: write
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          
       - name: Log in to Docker Hub
         uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
         if: ( !cancelled() )
