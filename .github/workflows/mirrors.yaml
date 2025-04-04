@@ -71,6 +71,7 @@ jobs:
             # 1 根据配置文件生成需要拉取的所有镜像列表和需要推送的目标镜像列表
             # 2 逐一检查，确认所有目标镜像是否存在
             # 3 拉取不存在的目标镜像的源，并向目标镜像仓库推送
+            set -x
 
             while IFS= read -r line; do
                 name=$(echo "$line" | awk -F'/' '{print $NF}' | sed 's/\[.*//')
