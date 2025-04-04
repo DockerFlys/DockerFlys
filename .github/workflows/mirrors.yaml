@@ -50,20 +50,20 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME_TENCENT }}
           password: ${{ secrets.DOCKER_PASSWORD_TENCENT }}
 
-      - name: Log in to Aliyun registry HZ
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
-        if: ( !cancelled() )
-        with:
-          registry: registry.cn-hangzhou.aliyuncs.com
-          username: ${{ secrets.DOCKER_USERNAME_ALIYUN }}
-          password: ${{ secrets.DOCKER_PASSWORD_ALIYUN }}
+      # - name: Log in to Aliyun registry HZ
+      #   uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+      #   if: ( !cancelled() )
+      #   with:
+      #     registry: registry.cn-hangzhou.aliyuncs.com
+      #     username: ${{ secrets.DOCKER_USERNAME_ALIYUN }}
+      #     password: ${{ secrets.DOCKER_PASSWORD_ALIYUN }}
 
-      - name: Log in to Aliyun registry USW
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
-        with:
-          registry: registry.us-west-1.aliyuncs.com
-          username: ${{ secrets.DOCKER_USERNAME_ALIYUN }}
-          password: ${{ secrets.DOCKER_PASSWORD_ALIYUN }}
+      # - name: Log in to Aliyun registry USW
+      #   uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+      #   with:
+      #     registry: registry.us-west-1.aliyuncs.com
+      #     username: ${{ secrets.DOCKER_USERNAME_ALIYUN }}
+      #     password: ${{ secrets.DOCKER_PASSWORD_ALIYUN }}
 
       - name: Mirror Docker images
         if: ( !cancelled() )
@@ -80,7 +80,8 @@ jobs:
                     IFS=';' read -ra bracket_parts <<< "$inside_bracket"
                     for version in "${bracket_parts[@]}"; do
                         needpull=false
-                        for registry in uswccr.ccs.tencentyun.com ccr.ccs.tencentyun.com registry.us-west-1.aliyuncs.com registry.cn-hangzhou.aliyuncs.com;do
+                        # for registry in uswccr.ccs.tencentyun.com ccr.ccs.tencentyun.com registry.us-west-1.aliyuncs.com registry.cn-hangzhou.aliyuncs.com;do
+                        for registry in uswccr.ccs.tencentyun.com ccr.ccs.tencentyun.com;do
                           # 逐个检查目标是否存在
                           if [ $(docker manifest inspect -v  ${registry}/${{ secrets.DOCKER_USERNAME }}/${name}:${version}|jq ".Descriptor.size") == '' ] ; then
                               needpull=true
@@ -91,7 +92,7 @@ jobs:
                         if [ ${needpull} ]; then
                             # 只要一个目标镜像不存在，拉下来以后都推送一轮 
                             docker pull ${source}:${version} &> /dev/null
-                            for registry in uswccr.ccs.tencentyun.com ccr.ccs.tencentyun.com registry.us-west-1.aliyuncs.com registry.cn-hangzhou.aliyuncs.com;do
+                            for registry in uswccr.ccs.tencentyun.com ccr.ccs.tencentyun.com;do
                               docker tag ${source}:${version} ${registry}/${{ secrets.DOCKER_USERNAME }}/${name}:${version} &> /dev/null
                               screen -dmS push-${registry}-${name} docker push ${registry}/${{ secrets.DOCKER_USERNAME }}/${name}:${version}
                             done
